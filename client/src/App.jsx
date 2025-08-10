@@ -40,13 +40,37 @@ export default function App() {
   if (error) return <div className="container">Error: {String(error)}</div>;
 
   return (
-    <div className="container">
-      <header style={{ marginBottom: 16 }}>
-        <h1 style={{ fontSize: 28, fontWeight: 800 }}>AI-First Weekly</h1>
-        <p style={{ opacity: 0.7, fontSize: 12 }}>
-          Updated: {data.generatedAt ? new Date(data.generatedAt).toLocaleString() : "never"}
-        </p>
-      </header>
+    <header style={{ marginBottom: 16 }}>
+      <h1 style={{ fontSize: 28, fontWeight: 800 }}>AI-First Weekly</h1>
+      <p style={{ opacity: 0.7, fontSize: 12 }}>
+        Updated: {data.generatedAt ? new Date(data.generatedAt).toLocaleString() : "never"}
+    </p>
+    <button
+      style={{
+        marginTop: 8,
+        padding: "4px 8px",
+        fontSize: 12,
+        cursor: "pointer",
+        border: "1px solid #ccc",
+        borderRadius: 4,
+        background: "#f9f9f9"
+    }}
+    onClick={async () => {
+      if (!confirm("Fetch latest headlines now?")) return;
+      try {
+        const url = import.meta.env.VITE_API_URL || "http://localhost:5174";
+        const res = await fetch(`${url}/api/fetch`, { method: "POST" });
+        const result = await res.json();
+        alert(`Fetched ${result.count || 0} new headlines.`);
+        window.location.reload();
+      } catch (err) {
+        alert("Error fetching headlines: " + err.message);
+      }
+    }}
+  >
+    Refresh now
+  </button>
+</header>
 
       <div style={{ display: "flex", gap: 8, marginBottom: 16 }}>
         <input
