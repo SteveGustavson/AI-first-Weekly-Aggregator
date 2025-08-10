@@ -1,0 +1,14 @@
+{
+  "name": "ai-first-weekly-aggregator",
+  "private": true,
+  "workspaces": ["client", "server"],
+  "scripts": {
+    "dev": "concurrently -k -n server,client -c magenta,cyan \"pnpm --filter server dev\" \"pnpm --filter client dev\"",
+    "build": "pnpm -r build",
+    "start": "pnpm --filter server start"
+  },
+  "devDependencies": {
+    "concurrently": "^9.0.1",
+    "pnpm": "^9.7.0"
+  }
+}
