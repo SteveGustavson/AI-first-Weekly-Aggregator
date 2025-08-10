@@ -1,11 +1,10 @@
 export const FEEDS = [
-  // Official frontier & platform blogs (multiple candidate URLs to avoid 404s)
   {
     name: "Google AI (The Keyword)",
     tags: ["frontier", "platform"],
     urls: [
-      "https://blog.google/rss/", // site-wide
-      "https://blog.google/technology/ai/rss/" // category (works in most regions)
+      "https://blog.google/rss/",
+      "https://blog.google/technology/ai/rss/"
     ]
   },
   {
@@ -21,8 +20,8 @@ export const FEEDS = [
     tags: ["frontier"],
     urls: [
       "https://openai.com/feed.xml",
-      "https://blog.openai.com/rss", // legacy
-      "https://openai.com/blog/rss.xml" // community‑referenced fallback
+      "https://blog.openai.com/rss",
+      "https://openai.com/blog/rss.xml"
     ]
   },
   {
@@ -30,7 +29,7 @@ export const FEEDS = [
     tags: ["frontier"],
     urls: [
       "https://www.anthropic.com/news/rss.xml",
-      "https://www.anthropic.com/rss.xml" // fallback if they expose a root feed
+      "https://www.anthropic.com/rss.xml"
     ]
   },
   {
@@ -48,7 +47,6 @@ export const FEEDS = [
       "https://blog.research.google/atom.xml"
     ]
   },
-  // Ecosystem / engineering
   {
     name: "NVIDIA Technical Blog (AI)",
     tags: ["engineering", "hardware"],
