@@ -1,6 +1,7 @@
 import Parser from "rss-parser";
-import cheerio from "cheerio";
+import { load } from "cheerio";          // ✅ correct ESM import
 
+// Node 18+ has global fetch built in — no node-fetch needed
 export const parser = new Parser({ timeout: 20000 });
 
 export async function tryFetch(url) {
@@ -22,10 +23,11 @@ export async function fetchFeedCandidates(candidates) {
 }
 
 export async function basicScrape(url, max = 10) {
+  // Fallback: scrape headlines if no feed exists
   try {
     const res = await tryFetch(url);
     const html = await res.text();
-    const $ = cheerio.load(html);
+    const $ = load(html);
     const items = [];
     $("article, .post, .entry").each((_, el) => {
       const a = $(el).find("a[href]").first();
