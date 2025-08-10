@@ -16,16 +16,15 @@ const log = pino({ level: process.env.LOG_LEVEL || "info" });
 
 const DATA_DIR = path.join(process.cwd(), "data");
 const DATA_FILE = path.join(DATA_DIR, "weekly.json");
-if (!fs.existsSync(DATA_DIR)) fs.mkdirSync(DATA_DIR);
+if (!fs.existsSync(DATA_DIR)) fs.mkdirSync(DATA_DIR, { recursive: true });
 
-async function aggregate(days = 7) {
+export async function aggregate(days = 7) {
   const since = subDays(new Date(), days);
   const aggregated = [];
 
   for (const src of FEEDS) {
     let result = await fetchFeedCandidates(src.urls);
     if (!result.ok) {
-      // try scraping the first URL as a last resort
       const scraped = await basicScrape(src.urls[0]);
       scraped.forEach(s => aggregated.push({
         source: src.name,
@@ -36,7 +35,6 @@ async function aggregate(days = 7) {
       }));
       continue;
     }
-
     const { feed, url } = result;
     for (const it of feed.items) {
       const item = normalizeItem(src.name, url, it);
@@ -46,7 +44,6 @@ async function aggregate(days = 7) {
     }
   }
 
-  // de‑dupe by link or title
   const seen = new Set();
   const deduped = aggregated.filter(it => {
     const key = (it.link || it.title).toLowerCase();
@@ -55,7 +52,6 @@ async function aggregate(days = 7) {
     return true;
   });
 
-  // sort by publishedAt desc
   deduped.sort((a, b) => new Date(b.publishedAt || 0) - new Date(a.publishedAt || 0));
 
   const payload = {
@@ -69,7 +65,6 @@ async function aggregate(days = 7) {
   return payload;
 }
 
-// Endpoint: trigger aggregation now
 app.post("/api/fetch", async (req, res) => {
   try {
     const days = z.number().int().positive().optional().parse(req.body?.days) || 7;
@@ -81,7 +76,6 @@ app.post("/api/fetch", async (req, res) => {
   }
 });
 
-// Endpoint: read latest
 app.get("/api/news", (req, res) => {
   try {
     if (!fs.existsSync(DATA_FILE)) return res.json({ generatedAt: null, items: [] });
@@ -92,7 +86,6 @@ app.get("/api/news", (req, res) => {
   }
 });
 
-// Health
 app.get("/health", (_, res) => res.json({ ok: true }));
 
 const PORT = process.env.PORT || 5174;
@@ -100,7 +93,6 @@ app.listen(PORT, () => {
   console.log(`API listening on :${PORT}`);
 });
 
-// Schedule: every Monday 09:00 America/Denver
 cron.schedule("0 9 * * 1", async () => {
   try {
     console.log("[cron] Weekly aggregation running…");
