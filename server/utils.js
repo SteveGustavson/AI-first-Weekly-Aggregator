@@ -1,6 +1,5 @@
 import Parser from "rss-parser";
 import cheerio from "cheerio";
-import fetch from "node-fetch";
 
 export const parser = new Parser({ timeout: 20000 });
 
@@ -15,15 +14,14 @@ export async function fetchFeedCandidates(candidates) {
     try {
       const feed = await parser.parseURL(url);
       if (feed?.items?.length) return { feed, url, ok: true };
-    } catch (e) {
-      // continue trying next candidate
+    } catch {
+      // try next candidate
     }
   }
   return { ok: false };
 }
 
 export async function basicScrape(url, max = 10) {
-  // Fallback: scrape headlines if no feed exists
   try {
     const res = await tryFetch(url);
     const html = await res.text();
@@ -36,7 +34,7 @@ export async function basicScrape(url, max = 10) {
       if (title && link) items.push({ title, link });
     });
     return items.slice(0, max);
-  } catch (e) {
+  } catch {
     return [];
   }
 }
